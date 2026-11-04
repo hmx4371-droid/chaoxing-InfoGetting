@@ -132,12 +132,14 @@ npm run dev
 | `throttle` | `0.5` | 每次请求之间的间隔（秒），别调太小，容易触发风控 |
 | `notice_limit` | `40` | 一次最多取多少条通知 |
 | `with_details` | `true` | 是否逐份作业拉详情（拿到截止时间，但慢） |
+| `proxy` | `""` | 代理地址，如 `http://127.0.0.1:7890`；留空 = 强制直连，**忽略系统代理** |
 
 环境变量优先级高于 `config.json`：
 
 | 变量 | 作用 |
 |---|---|
 | `CHAOXING_PHONE` / `CHAOXING_PASSWORD` | 直接提供凭据，适合 CI 或临时调试 |
+| `CHAOXING_PROXY` | 强制走指定代理；不设且 `config.json` 也没配 `proxy`，就直连（忽略系统代理） |
 | `MYSQL_USER` / `MYSQL_PASSWORD` | 后端 MySQL 账号密码 |
 | `DEMO_AUTO_SYNC` | `true` 开启定时同步（默认 `false`，cron 为每 30 分钟一次） |
 | `DEMO_REDIS` | `true` 启用 Redis 做同步锁与概览缓存；没装 Redis 就保持 `false`，会自动降级为进程内实现 |
@@ -209,7 +211,7 @@ npm run dev
 
 1. **明文密码从不落盘**。`config.json` 的 `password` 字段永远是空字符串，老版本遗留的明文会在启动时迁移成密文并清空。
 2. **密钥与配置分离**。`secret.key` 是首次使用时随机生成的 32 字节密钥，`config.json` 和 `secret.key` 都做了权限收紧（Windows `icacls` 只留当前用户，Linux/macOS `chmod 600`）。只拿到 `config.json` 解不开密码。
-3. **接口不回显**。`/api/account` 只返回脱敏手机号（形如 `138****0000`），任何响应里都没有密码字段。
+3. **接口不回显**。`/api/account` 只返回打码后的手机号（保留前 3 位与后 4 位），任何响应里都没有密码字段。
 4. **日志不打印密码**。登录过程只记录成功/失败。
 5. **密码不经过 Java 后端**。浏览器 → 采集服务这条链路上完成登录，Java 只拿业务数据。
 6. **随时可清**。点「退出登录」或调 `POST /api/logout`，会删掉 cookie 与 `password_enc`。
@@ -297,6 +299,10 @@ python probe.py --dump
 ```
 
 键名照抄 Chrome 里显示的 name，值照抄 value。建议在**自己电脑自己的网络**上跑，机房或云服务器 IP 容易被风控挡掉。
+
+**登录报 500 / SSLError（UNEXPECTED_EOF_WHILE_READING）**
+
+本机 VPN、加速器（Clash、iKuuu 之类）会把系统代理写进注册表，而 Windows 上的 `requests` 会自动读取它，学习通的 TLS 握手就被打断。采集服务现在默认**忽略系统代理、直接连**，正常不会再遇到；确实需要走代理就在 `collector/config.json` 里配 `"proxy": "http://127.0.0.1:7890"`。网络类错误会以文字显示在登录弹窗里，不再是裸的 500。
 
 **页面显示「采集服务未启动」**
 

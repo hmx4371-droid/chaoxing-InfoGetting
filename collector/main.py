@@ -24,6 +24,7 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from requests import RequestException
 
 from chaoxing.client import ChaoxingClient, _TZ_CN
 from chaoxing.collect import collect
@@ -85,6 +86,7 @@ def config_writable_defaults() -> None:
     write_config({
         "phone": "", "password_enc": "", "remember": False,
         "mock": True, "throttle": 0.5, "notice_limit": 40, "with_details": True,
+        "proxy": "",
     })
 
 
@@ -323,6 +325,12 @@ def _startup() -> None:
     STORE.credentials()
 
 
+def _net_error(e: Exception) -> str:
+    """把网络层异常翻成人话，别让前端只看到 500。"""
+    return (f"连不上学习通（{type(e).__name__}）。如果开着 VPN 或系统代理，"
+            "先关掉再试；确实需要代理就在 config.json 里配 proxy。")
+
+
 def _account_view(client: ChaoxingClient | None, logged_in: bool, msg: str) -> dict:
     """账号信息对外视图：手机号脱敏，绝不含密码。"""
     profile = cached_profile(client) if (logged_in and client is not None) else {}
@@ -363,7 +371,10 @@ def account(check: bool = True) -> dict:
     if not check:
         return {"logged_in": None, "mock": False, **_account_view(None, False, "")}
     client = get_client()
-    res = client.ensure_login()
+    try:
+        res = client.ensure_login()
+    except RequestException as e:
+        return {**_account_view(client, False, _net_error(e)), "mock": False}
     view = _account_view(client, res.ok, res.msg)
     view["mock"] = False
     return view
@@ -389,7 +400,10 @@ def login(body: LoginBody) -> dict:
     STORE.save(phone, body.password, body.remember)
     invalidate_profile_cache()
     client = get_client(force_new=True)
-    res = client.login(phone, body.password)
+    try:
+        res = client.login(phone, body.password)
+    except RequestException as e:
+        return {"ok": False, "msg": _net_error(e)}
     if not res.ok:
         return {"ok": False, "msg": res.msg}
     return {"ok": True, "msg": res.msg, "account": _account_view(client, True, res.msg)}

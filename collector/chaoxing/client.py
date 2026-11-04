@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import html as html_mod
 import json
 import os
@@ -319,9 +320,20 @@ class ChaoxingClient:
     # ---------------- 会话与登录 ----------------
 
     def _build_session(self) -> requests.Session:
-        """带 UA、重试策略与本地 cookie 的会话。"""
+        """带 UA、重试策略与本地 cookie 的会话。
+
+        默认**不走系统代理**：Windows 上 requests 会读注册表里的代理设置，
+        本地 VPN / 加速器的系统代理常把学习通的 TLS 握手打断
+        （SSLEOFError: UNEXPECTED_EOF_WHILE_READING，前端看到的就是登录 500）。
+        确实需要走代理时，在 config.json 配 "proxy"，或设环境变量 CHAOXING_PROXY。
+        """
         s = requests.Session()
         s.headers.update({"User-Agent": UA})
+        s.trust_env = False
+        proxy = (os.environ.get("CHAOXING_PROXY")
+                 or self._read_config().get("proxy") or "").strip()
+        if proxy:
+            s.proxies = {"http": proxy, "https": proxy}
         retry = Retry(total=2, backoff_factor=0.5,
                       status_forcelist=(429, 502, 503, 504),
                       allowed_methods=frozenset(["GET", "POST"]))
@@ -380,18 +392,28 @@ class ChaoxingClient:
     def _owner_file(self) -> str:
         return os.path.join(self.config_dir, "session_owner.json")
 
+    @staticmethod
+    def _owner_token(phone: str) -> str:
+        """手机号的摘要，用来判断 cookie 属于谁——不把手机号明文写到磁盘上。"""
+        return hashlib.sha256(str(phone or "").strip().encode("utf-8")).hexdigest()[:24]
+
     def _read_owner(self) -> str:
-        """记录当前 cookie 属于哪个手机号。"""
+        """返回当前 cookie 归属账号的摘要（兼容老版本存的明文手机号）。"""
         try:
             with open(self._owner_file(), encoding="utf-8-sig") as f:
-                return str((json.load(f) or {}).get("phone") or "")
+                data = json.load(f) or {}
         except Exception:
             return ""
+        token = str(data.get("token") or "")
+        if token:
+            return token
+        legacy = str(data.get("phone") or "")
+        return self._owner_token(legacy) if legacy else ""
 
     def _write_owner(self, phone: str) -> None:
         try:
             with open(self._owner_file(), "w", encoding="utf-8") as f:
-                json.dump({"phone": phone}, f)
+                json.dump({"token": self._owner_token(phone)}, f)
         except Exception:
             pass
 
@@ -448,8 +470,8 @@ class ChaoxingClient:
         """
         phone, _ = self._load_credentials()
         owner = self._read_owner()
-        if not force and phone and owner != phone:
-            print(f"[info] 检测到账号变更（cookie 属于 {owner or '未知'}，配置是 {phone}），强制重新登录")
+        if not force and phone and owner != self._owner_token(phone):
+            print("[info] 检测到账号变更，丢弃旧会话并强制重新登录")
             force = True
             self._drop_session()
             self._login_checked_at = 0.0
