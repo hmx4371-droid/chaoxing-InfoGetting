@@ -1,0 +1,9 @@
+{
+  "phone": "",
+  "password_enc": "",
+  "remember": false,
+  "mock": true,
+  "throttle": 0.5,
+  "notice_limit": 40,
+  "with_details": true
+}

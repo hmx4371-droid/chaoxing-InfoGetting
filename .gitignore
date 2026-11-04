@@ -1,0 +1,15 @@
+# demo 构建产物与本地数据
+backend/target/
+backend/data/
+backend/*.log
+frontend/node_modules/
+frontend/dist/
+collector/data/
+collector/config.json
+collector/config.json.bak
+collector/secret.key
+collector/session_cookies.json
+collector/session_owner.json
+collector/probe_out/
+**/__pycache__/
+*.pyc

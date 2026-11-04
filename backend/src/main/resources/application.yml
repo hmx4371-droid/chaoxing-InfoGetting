@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: notify-demo
+
+  # ---------- MySQL（默认）----------
+  # 建库：CREATE DATABASE notify_demo DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/notify_demo?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+
+  # 启动时自动建表（schema.sql 里全是 IF NOT EXISTS，重复执行安全）
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+
+  # snake_case 与采集器、前端的字段命名保持一致（item_type / source_id / start_time）
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+# ---------- 本 demo 的业务配置 ----------
+demo:
+  collector:
+    base-url: http://127.0.0.1:8801
+    # 采集器一轮可能要 1-2 分钟（逐份作业详情），这里给足读取超时
+    read-timeout-seconds: 120
+  sync:
+    # 一次性触发同步后，最多等采集器多久（秒）
+    wait-timeout-seconds: 300
+    poll-interval-ms: 1500
+    # 定时自动同步（demo 默认关闭，避免在调试时反复打扰学习通）
+    auto-enabled: ${DEMO_AUTO_SYNC:false}
+    cron: "0 */30 * * * *"
+  # 本机没装 Redis 就保持 false，同步锁与 overview 缓存自动降级为进程内实现
+  redis-enabled: ${DEMO_REDIS:false}
+
+logging:
+  level:
+    com.example.notify: INFO

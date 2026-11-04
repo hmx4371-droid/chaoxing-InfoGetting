@@ -1,0 +1,433 @@
+/* 全局样式：浅色、白卡、细边框，主色只点缀交互态 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5f6f8;
+  color: #1f2329;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 20px 56px;
+}
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #1f8fff;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.brand .sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #8a8f99;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.ok {
+  background: #22c55e;
+}
+
+.dot.bad {
+  background: #ef4444;
+}
+
+.muted {
+  color: #8a8f99;
+  font-size: 13px;
+}
+
+/* ---------- 同步信息行 ---------- */
+.meta {
+  margin: 14px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #5b6472;
+}
+
+.badge.mock {
+  background: #fff4e5;
+  color: #b45309;
+}
+
+.badge.err {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.auto-tip {
+  font-size: 12px;
+  color: #b0b4bb;
+}
+
+/* 当前采集的学习通账号 */
+.account {
+  font-size: 12px;
+  color: #4b5563;
+  background: #eef2f7;
+  border-radius: 6px;
+  padding: 1px 8px;
+}
+
+/* 同步成功但没内容时的说明条 */
+.banner {
+  border: 1px solid #ffe0b2;
+  background: #fffbf2;
+  color: #7a5b18;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.banner code {
+  background: #f3ead9;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12px;
+}
+
+.banner.warn {
+  border-color: #ffd7d7;
+  background: #fff6f6;
+  color: #8a2b2b;
+}
+
+/* 登录弹窗里的说明文字 */
+.dialog-tip {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8a8f99;
+}
+
+.dialog-tip code {
+  background: #eef1f5;
+  border-radius: 4px;
+  padding: 1px 4px;
+  color: #4b5563;
+}
+
+/* ---------- 统计卡 ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.stat .label {
+  font-size: 12px;
+  color: #8a8f99;
+}
+
+.stat .value {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.stat .unit {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8a8f99;
+  margin-left: 3px;
+}
+
+.stat.warn .value {
+  color: #ef4444;
+}
+
+/* ---------- 卡片网格 ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.card-head .hint {
+  font-size: 12px;
+  color: #9aa0a6;
+}
+
+/* ---------- 列表行 ---------- */
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid #f0f1f3;
+}
+
+.row:first-of-type {
+  border-top: none;
+}
+
+.row-main {
+  min-width: 0;
+}
+
+.row-title {
+  font-size: 14px;
+  line-height: 1.45;
+  word-break: break-all;
+}
+
+.row-title.dim {
+  color: #9aa0a6;
+  text-decoration: line-through;
+}
+
+.row-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #8a8f99;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.row-right {
+  flex: none;
+  text-align: right;
+  font-size: 12px;
+}
+
+.countdown {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.countdown.red {
+  color: #ef4444;
+}
+
+.countdown.orange {
+  color: #f59e0b;
+}
+
+.countdown.gray {
+  color: #9aa0a6;
+  font-weight: 400;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 3px;
+  color: #1f8fff;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  padding: 22px 0;
+  text-align: center;
+  color: #9aa0a6;
+  font-size: 13px;
+}
+
+/* ---------- 课表 ---------- */
+.day-block {
+  margin-top: 14px;
+}
+
+.day-block:first-of-type {
+  margin-top: 6px;
+}
+
+.day-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-title .today {
+  font-size: 11px;
+  font-weight: 400;
+  color: #1f8fff;
+  background: #eaf4ff;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.lesson {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0 8px 2px;
+  border-top: 1px dashed #eef0f3;
+}
+
+.lesson .time {
+  flex: none;
+  width: 92px;
+  font-size: 12px;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+
+.lesson .name {
+  font-size: 13.5px;
+}
+
+.lesson .where {
+  font-size: 12px;
+  color: #8a8f99;
+  margin-top: 2px;
+}
+
+.lesson.now .name {
+  color: #1f8fff;
+  font-weight: 600;
+}
+
+.lesson.done {
+  opacity: 0.55;
+}
+
+/* ---------- 通知 ---------- */
+.notice {
+  display: flex;
+  gap: 9px;
+  padding: 10px 0;
+  border-top: 1px solid #f0f1f3;
+}
+
+.notice:first-of-type {
+  border-top: none;
+}
+
+.notice .flag {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 7px;
+  background: transparent;
+}
+
+.notice.unread .flag {
+  background: #ef4444;
+}
+
+.notice .title {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.notice.unread .title {
+  font-weight: 600;
+}
+
+.notice .meta2 {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #8a8f99;
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

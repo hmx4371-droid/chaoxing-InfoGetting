@@ -1,0 +1,11 @@
+# 采集服务本地文件，绝不进 git
+config.json
+config.json.bak
+secret.key
+session_cookies.json
+session_owner.json
+probe_out/
+data/
+__pycache__/
+*.pyc
+.venv/
